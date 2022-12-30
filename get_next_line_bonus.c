@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joohekim <joohekim@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jooheekim <jooheekim@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 15:26:50 by joohekim          #+#    #+#             */
-/*   Updated: 2022/12/29 20:56:43 by joohekim         ###   ########.fr       */
+/*   Updated: 2022/12/30 23:28:08 by jooheekim        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 #include <stdio.h>
 
 // int BUFFER_SIZE = 1;
@@ -36,18 +36,29 @@ static t_gnl_node	*new_fd(int fd)
 
 static t_gnl_node	*find_fd(int fd, t_gnl_list *list)
 {
-	while (list->cur != NULL)
+	if (list->cur)
 	{
-		if (list->cur->fd == fd)
-			return (list->cur);
-		list->pre = NULL;
-		list->pre = list->cur;
-		list->cur = list->cur->next;
+		// list->cur = list->start;
+		while (list->cur)
+		{
+			if (list->cur->fd == fd)
+			{
+				if (!(list->pre))
+					list->pre = NULL;
+				return (list->cur);
+			}
+			else
+			{
+				list->pre = list->cur;
+				list->cur = list->cur->next;
+			}
+		}
 	}
-	list->pre = NULL;
+	else
+		list->pre = NULL;
 	list->cur = new_fd(fd);
-	if (list->pre != NULL)
-		list->pre->next = list->cur;
+	// if (!(list->start))
+	// 	list->start = list->cur;
 	if (!list->cur)
 		return (NULL);
 	return (list->cur);
@@ -115,8 +126,8 @@ char	*get_next_line(int fd)
 {
 	static t_gnl_list	*list;
 	char				*line;
-	char				*temp;
 	int					cnt;
+	char *temp;
 
 	cnt = 1;
 	if (fd < 0)
@@ -143,8 +154,6 @@ char	*get_next_line(int fd)
 		return (NULL);
 	}
 	line = substr_line(list);
-	// printf("%p\n", list);
-	// printf("%p\n", list->cur);
 	if (cnt == 0)
 	{
 		temp = substr_line(list);
@@ -158,53 +167,89 @@ char	*get_next_line(int fd)
 
 // #include <fcntl.h>
 // #include <stdio.h>
-// #include "get_next_line_utils.c"
+// #include "get_next_line_utils_bonus.c"
 
 // int main(void)
 // {
 // 	char *result = "";
-// 	int fd[4];
-// 	fd[0] = open("files/41_with_nl", O_RDWR);
-// 	fd[1] = open("files/42_with_nl", O_RDWR);
-// 	fd[2] = open("files/43_with_nl", O_RDWR);
-// 	fd[3] = open("files/nl", O_RDWR);
-// 	result = get_next_line(1000);
+// 	// int fd[2];
+// 	// fd[0] = open("lines_around_10.txt", O_RDWR);
+// 	// fd[1] = open("lines_around_10.txt", O_RDWR);
+// 	// result = get_next_line(fd[0]);
+// 	// printf("%s\n", result);
+// 	// result = get_next_line(fd[1]);
+// 	// printf("%s\n", result);
+// 	// result = get_next_line(fd[0]);
+// 	// printf("%s\n", result);
+// 	// result = get_next_line(fd[1]);
+// 	// printf("%s\n", result);
+// 	// result = get_next_line(fd[0]);
+// 	// printf("%s\n", result);
+// 	// result = get_next_line(fd[1]);
+// 	// printf("%s\n", result);
+// 	// // close(fd);
+// 	// system("leaks --list -- a.out");
+
+// 	char *name = "lines_around_10.txt";
+// 	int fd_1 = open(name, O_RDONLY);
+// 	int fd_2 = open(name, O_RDONLY);
+// 	int fd_3 = open(name, O_RDONLY);
+// 	/* 1 */ result = get_next_line(fd_1);
 // 	printf("%s\n", result);
-// 	result = get_next_line(fd[0]);
+// 	/* 2 */ result = get_next_line(fd_2);
 // 	printf("%s\n", result);
-	
-// 	result = get_next_line(1001);
+// 	/* 3 */ result = get_next_line(fd_3);
 // 	printf("%s\n", result);
-// 	result = get_next_line(fd[1]);
+// 	/* 4 */ result = get_next_line(fd_1);
 // 	printf("%s\n", result);
-	
-// 	result = get_next_line(1002);
+// 	/* 5 */ result = get_next_line(fd_2);
 // 	printf("%s\n", result);
-// 	result = get_next_line(fd[2]);
+// 	/* 6 */ result = get_next_line(fd_2);
 // 	printf("%s\n", result);
-	
-// 	result = get_next_line(1003);
+
+// 	int fd_4 = open("giant_line_nl.txt", O_RDONLY);
+// 	/* 7 */ result = get_next_line(fd_2);
 // 	printf("%s\n", result);
-// 	result = get_next_line(fd[0]);
+// 	/* 8 */ result = get_next_line(fd_3);
 // 	printf("%s\n", result);
-	
-// 	result = get_next_line(1004);
+// 	/* 9 */ result = get_next_line(fd_4);
 // 	printf("%s\n", result);
-// 	result = get_next_line(fd[1]);
+// 	/* 10 */ result = get_next_line(fd_2);
 // 	printf("%s\n", result);
-	
-// 	result = get_next_line(1005);
+// 	/* 11 */ result = get_next_line(fd_2);
 // 	printf("%s\n", result);
-// 	result = get_next_line(fd[2]);
+// 	/* 12 */ result = get_next_line(fd_1);
 // 	printf("%s\n", result);
-	
-// 	result = get_next_line(fd[0]);
+// 	/* 13 */ result = get_next_line(fd_4);
 // 	printf("%s\n", result);
-// 	result = get_next_line(fd[1]);
+// 	/* 14 */ result = get_next_line(fd_1);
 // 	printf("%s\n", result);
-// 	result = get_next_line(fd[2]);
+// 	/* 15 */ result = get_next_line(fd_4);
 // 	printf("%s\n", result);
-	
+// 	/* 16 */ result = get_next_line(fd_1);
+// 	printf("%s\n", result);
+// 	/* 17 */ result = get_next_line(fd_4);
+// 	printf("%s\n", result);
+// 	/* 18 */ result = get_next_line(fd_3);
+// 	printf("%s\n", result);
+// 	/* 19 */ result = get_next_line(fd_3);
+// 	printf("%s\n", result);
+// 	/* 20 */ result = get_next_line(fd_1);
+// 	printf("%s\n", result);
+// 	/* 21 */ result = get_next_line(fd_3);
+// 	printf("%s\n", result);
+// 	/* 22 */ result = get_next_line(fd_3);
+// 	printf("%s\n", result);
 // 	system("leaks --list -- a.out");
 // }
 
+// int main()
+// {
+// 	char *result = "";
+// 	int fd[1];
+// 	fd[0] = open("1char.txt", O_RDWR);
+// 	result = get_next_line(fd[0]);
+// 	printf("%s\n", result);
+// 	result = get_next_line(fd[0]);
+// 	printf("%s\n", result);
+// }
