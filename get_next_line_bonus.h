@@ -6,7 +6,7 @@
 /*   By: jooheekim <jooheekim@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 15:26:53 by joohekim          #+#    #+#             */
-/*   Updated: 2022/12/30 23:31:30 by jooheekim        ###   ########.fr       */
+/*   Updated: 2022/12/31 01:00:21 by jooheekim        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ typedef struct s_gnl_list
 	t_gnl_node	*start;
 	t_gnl_node	*pre;
 	t_gnl_node	*cur;
+	int			fd_cnt;
 }	t_gnl_list;
 
 size_t	ft_strlen(const char *str);

@@ -6,7 +6,7 @@
 /*   By: jooheekim <jooheekim@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 15:26:50 by joohekim          #+#    #+#             */
-/*   Updated: 2022/12/30 23:28:08 by jooheekim        ###   ########.fr       */
+/*   Updated: 2022/12/31 01:50:47 by jooheekim        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "get_next_line_bonus.h"
 #include <stdio.h>
 
-// int BUFFER_SIZE = 1;
+int BUFFER_SIZE = 1;
 
 static t_gnl_node	*new_fd(int fd)
 {
@@ -36,9 +36,10 @@ static t_gnl_node	*new_fd(int fd)
 
 static t_gnl_node	*find_fd(int fd, t_gnl_list *list)
 {
-	if (list->cur)
+	if (list->start)
 	{
-		// list->cur = list->start;
+		list->cur = list->start;
+		list->pre = NULL;
 		while (list->cur)
 		{
 			if (list->cur->fd == fd)
@@ -57,8 +58,11 @@ static t_gnl_node	*find_fd(int fd, t_gnl_list *list)
 	else
 		list->pre = NULL;
 	list->cur = new_fd(fd);
-	// if (!(list->start))
-	// 	list->start = list->cur;
+	list->fd_cnt++;
+	if (list->pre)
+		list->pre->next = list->cur;
+	if (!(list->start))
+		list->start = list->cur;
 	if (!list->cur)
 		return (NULL);
 	return (list->cur);
@@ -137,7 +141,10 @@ char	*get_next_line(int fd)
 		list = (t_gnl_list *)malloc(sizeof(t_gnl_list));
 		if (!list)
 			return (NULL);
+		list->fd_cnt = 0;
+		list->start = NULL;
 		list->cur = NULL;
+		list->pre = NULL;
 	}
 	if (!(find_fd(fd, list)))
 	{
@@ -147,10 +154,9 @@ char	*get_next_line(int fd)
 	}
 	if (!(read_line(list, &cnt)))
 	{
-		free(list->cur->backup);
-		free(list->cur);
-		free(list);
-		list = NULL;
+		if (list->start == list->cur)
+			list->start = list->start->next;
+		del_fd(list);
 		return (NULL);
 	}
 	line = substr_line(list);
@@ -165,30 +171,35 @@ char	*get_next_line(int fd)
 	return (line);
 }
 
-// #include <fcntl.h>
-// #include <stdio.h>
-// #include "get_next_line_utils_bonus.c"
+#include <fcntl.h>
+#include <stdio.h>
+#include "get_next_line_utils_bonus.c"
 
-// int main(void)
-// {
-// 	char *result = "";
-// 	// int fd[2];
-// 	// fd[0] = open("lines_around_10.txt", O_RDWR);
-// 	// fd[1] = open("lines_around_10.txt", O_RDWR);
-// 	// result = get_next_line(fd[0]);
-// 	// printf("%s\n", result);
-// 	// result = get_next_line(fd[1]);
-// 	// printf("%s\n", result);
-// 	// result = get_next_line(fd[0]);
-// 	// printf("%s\n", result);
-// 	// result = get_next_line(fd[1]);
-// 	// printf("%s\n", result);
-// 	// result = get_next_line(fd[0]);
-// 	// printf("%s\n", result);
-// 	// result = get_next_line(fd[1]);
-// 	// printf("%s\n", result);
-// 	// // close(fd);
-// 	// system("leaks --list -- a.out");
+int main(void)
+{
+	char *result = "";
+	// int fd[3];
+	// fd[0] = open("lines_around_10.txt", O_RDWR);
+	// fd[1] = open("lines_around_10.txt", O_RDWR);
+	// fd[2] = open("lines_around_10.txt", O_RDWR);
+	int fd = open("empty.txt", O_RDONLY);
+	close(fd);
+	result = get_next_line(fd);
+	printf("%s\n", result);
+	// result = get_next_line(fd[1]);
+	// printf("%s\n", result);
+	// result = get_next_line(fd[1]);
+	// printf("%s\n", result);
+	// result = get_next_line(fd[2]);
+	// printf("%s\n", result);
+	// result = get_next_line(fd[1]);
+	// printf("%s\n", result);
+	// result = get_next_line(fd[0]);
+	// printf("%s\n", result);
+	// result = get_next_line(fd[2]);
+	// printf("%s\n", result);
+	// close(fd);
+	system("leaks --list -- a.out");
 
 // 	char *name = "lines_around_10.txt";
 // 	int fd_1 = open(name, O_RDONLY);
@@ -240,8 +251,8 @@ char	*get_next_line(int fd)
 // 	printf("%s\n", result);
 // 	/* 22 */ result = get_next_line(fd_3);
 // 	printf("%s\n", result);
-// 	system("leaks --list -- a.out");
-// }
+	// system("leaks --list -- a.out");
+}
 
 // int main()
 // {

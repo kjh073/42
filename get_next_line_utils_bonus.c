@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joohekim <joohekim@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jooheekim <jooheekim@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 15:26:47 by joohekim          #+#    #+#             */
-/*   Updated: 2022/12/29 14:14:57 by joohekim         ###   ########.fr       */
+/*   Updated: 2022/12/31 01:39:21 by jooheekim        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 size_t	ft_strlen(const char *str)
 {
@@ -93,4 +93,10 @@ void	del_fd(t_gnl_list *list)
 	free(list->cur->backup);
 	free(list->cur);
 	list->cur = NULL;
+	list->fd_cnt--;
+	if (list->fd_cnt == 0)
+	{
+		free(list);
+		list = NULL;
+	}
 }
